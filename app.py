@@ -2,12 +2,6 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 import json
 import re
 import uuid
-<<<<<<< HEAD
-from datetime import datetime
-
-app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Required for session management
-=======
 import os
 from datetime import datetime
 
@@ -21,20 +15,15 @@ def after_request(response):
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['X-XSS-Protection'] = '1; mode=block'
     return response
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
 
 # ===== GLOBAL STATE =====
 conversation_states = {}
 user_preferences = {}  # Store theme and font size preferences
 
-<<<<<<< HEAD
-=======
 # Simple rate limiting (in production, use Redis or similar)
 from collections import defaultdict
 import time
 rate_limit_storage = defaultdict(list)
-
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
 # ===== CHATBOT DATA =====
 qa_pairs = [
     # Acte de naissance
@@ -46,43 +35,17 @@ qa_pairs = [
             "akd izdiad", "chahada izdiad", "akd l izdiad"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Documents requis</h4>
-        <h4 class="arabic-title">الوثائق المطلوبة</h4>
-        <ul>
-            <li>
-                <div class="french-text">Formulaire de demande rempli et signé</div>
-                <div class="arabic-text">استمارة الطلب معبأة وموقعة</div>
-            </li>
-            <li>
-                <div class="french-text">Pièce d'identité du demandeur</div>
-                <div class="arabic-text">بطاقة التعريف الوطنية للمتقدم</div>
-            </li>
-            <li>
-                <div class="french-text">Livret de famille (si disponible)</div>
-                <div class="arabic-text">دفتر الحالة المدنية (إن وجد)</div>
-            </li>
-            <li>
-                <div class="french-text">Timbres fiscaux (montant selon le type de demande)</div>
-                <div class="arabic-text">طوابع ضريبية (المبلغ حسب نوع الطلب)</div>
-            </li>
-=======
         <h4>📋 Documents requis / الوثائق المطلوبة :</h4>
         <ul>
             <li>Formulaire de demande rempli et signé / استمارة الطلب معبأة وموقعة</li>
             <li>Pièce d'identité du demandeur / بطاقة التعريف الوطنية للمتقدم</li>
             <li>Livret de famille (si disponible) / دفتر الحالة المدنية (إن وجد)</li>
             <li>Timbres fiscaux (montant selon le type de demande) / طوابع ضريبية (المبلغ حسب نوع الطلب)</li>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         </ul>
     </div>"""
     },
     
-<<<<<<< HEAD
-    # Horaires d'ouverture (update to only Monday to Friday)
-=======
     # Horaires d'ouverture
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     {
         "questions": [
             "quels sont les horaires d'ouverture", "horaires d'ouverture", "heures d'ouverture", 
@@ -92,19 +55,10 @@ qa_pairs = [
             "awqat l3amal", "ouverture", "ouvertur", "ouvertur mairie"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Horaires d'ouverture</h4>
-        <h4 class="arabic-title">أوقات العمل</h4>
-        <div class="schedule-item">
-            <div class="french-text"><strong>Lundi - Vendredi :</strong> 8h00 - 16h00</div>
-            <div class="arabic-text"><strong>الاثنين - الجمعة :</strong> 8:00 صباحاً - 4:00 مساءً</div>
-        </div>
-=======
         <h4>🕐 Horaires d'ouverture / أوقات العمل :</h4>
         <p><strong>Lundi - Vendredi / الاثنين - الجمعة :</strong> 8h00 - 16h00 / 8:00 صباحاً - 4:00 مساءً</p>
         <p><strong>Samedi / السبت :</strong> 8h00 - 12h00 / 8:00 صباحاً - 12:00 ظهراً</p>
         <p><strong>Dimanche / الأحد :</strong> Fermé / مغلق</p>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     </div>"""
     },
     
@@ -118,31 +72,6 @@ qa_pairs = [
             "shahada sokna", "chahadat sokna", "shahadat sokna"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Documents requis</h4>
-        <h4 class="arabic-title">الوثائق المطلوبة</h4>
-        <ul>
-            <li>
-                <div class="french-text">Formulaire de demande rempli et signé</div>
-                <div class="arabic-text">استمارة الطلب معبأة وموقعة</div>
-            </li>
-            <li>
-                <div class="french-text">Pièce d'identité nationale</div>
-                <div class="arabic-text">البطاقة الوطنية للتعريف</div>
-            </li>
-            <li>
-                <div class="french-text">Justificatif de domicile (facture d'eau, électricité, téléphone)</div>
-                <div class="arabic-text">وثيقة تثبت العنوان (فاتورة ماء، كهرباء، هاتف)</div>
-            </li>
-            <li>
-                <div class="french-text">Contrat de location ou titre de propriété (si applicable)</div>
-                <div class="arabic-text">عقد الإيجار أو سند الملكية (إن وجد)</div>
-            </li>
-            <li>
-                <div class="french-text">Timbres fiscaux (10 dirhams)</div>
-                <div class="arabic-text">طوابع ضريبية (10 دراهم)</div>
-            </li>
-=======
         <h4>🏠 Documents requis / الوثائق المطلوبة :</h4>
         <ul>
             <li>Formulaire de demande rempli et signé / استمارة الطلب معبأة وموقعة</li>
@@ -150,7 +79,6 @@ qa_pairs = [
             <li>Justificatif de domicile (facture d'eau, électricité, téléphone) / وثيقة تثبت العنوان (فاتورة ماء، كهرباء، هاتف)</li>
             <li>Contrat de location ou titre de propriété (si applicable) / عقد الإيجار أو سند الملكية (إن وجد)</li>
             <li>Timbres fiscaux (10 dirhams) / طوابع ضريبية (10 دراهم)</li>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         </ul>
     </div>"""
     },
@@ -166,28 +94,11 @@ qa_pairs = [
             "fin ljam3a", "fin jam3a"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Adresse de la mairie</h4>
-        <h4 class="arabic-title">عنوان الجماعة</h4>
-        <div class="address-item">
-            <div class="french-text"><strong>Commune de Fès</strong></div>
-            <div class="arabic-text"><strong>جماعة فاس</strong></div>
-        </div>
-        <div class="address-item">
-            <div class="french-text">Hôtel de Ville de Fès</div>
-            <div class="arabic-text">بلدية فاس</div>
-        </div>
-        <div class="address-item">
-            <div class="french-text"><strong>Contact :</strong> Service d'accueil</div>
-            <div class="arabic-text"><strong>الاتصال :</strong> مكتب الاستقبال</div>
-        </div>
-=======
         <h4>📍 Adresse de la mairie / عنوان الجماعة :</h4>
         <p><strong>Commune de Fès / جماعة فاس</strong></p>
         <p>Avenue des FAR / شارع القوات المسلحة الملكية</p>
         <p>Fès, Maroc / فاس، المغرب</p>
         <p><strong>Téléphone / الهاتف :</strong> 05 35 62 56 95</p>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     </div>"""
     },
     
@@ -202,36 +113,6 @@ qa_pairs = [
             "carta watania", "carta watania maroc", "carta watania marok"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Documents requis</h4>
-        <h4 class="arabic-title">الوثائق المطلوبة</h4>
-        <ul>
-            <li>
-                <div class="french-text">Extrait d'acte de naissance récent (moins de 3 mois)</div>
-                <div class="arabic-text">نسخة موجزة من عقد الازدياد حديثة (أقل من 3 أشهر)</div>
-            </li>
-            <li>
-                <div class="french-text">4 photos d'identité récentes, en couleur, sur fond blanc</div>
-                <div class="arabic-text">أربع صور فوتوغرافية حديثة ملونة بخلفية بيضاء</div>
-            </li>
-            <li>
-                <div class="french-text">Certificat de résidence</div>
-                <div class="arabic-text">شهادة السكنى</div>
-            </li>
-            <li>
-                <div class="french-text">Ancienne carte d'identité (en cas de renouvellement)</div>
-                <div class="arabic-text">البطاقة الوطنية القديمة (في حالة التجديد)</div>
-            </li>
-            <li>
-                <div class="french-text">Timbres fiscaux (30 dirhams)</div>
-                <div class="arabic-text">طوابع ضريبية (30 دراهم)</div>
-            </li>
-        </ul>
-        <div class="processing-time">
-            <div class="french-text"><strong>Durée de traitement :</strong> 15-30 jours</div>
-            <div class="arabic-text"><strong>مدة المعالجة :</strong> 15-30 يوماً</div>
-        </div>
-=======
         <h4>🆔 Documents requis / الوثائق المطلوبة :</h4>
         <ul>
             <li>Extrait d'acte de naissance récent (moins de 3 mois) / نسخة موجزة من عقد الازدياد حديثة (أقل من 3 أشهر)</li>
@@ -241,7 +122,6 @@ qa_pairs = [
             <li>Timbres fiscaux (30 dirhams) / طوابع ضريبية (30 دراهم)</li>
         </ul>
         <p><strong>Durée de traitement / مدة المعالجة :</strong> 15-30 jours / 15-30 يوماً</p>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     </div>"""
     },
     
@@ -255,32 +135,6 @@ qa_pairs = [
             "taxe communale?", "taxe municipale?"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Paiement des taxes</h4>
-        <h4 class="arabic-title">دفع الضرائب</h4>
-        <div class="section-title">
-            <div class="french-text"><strong>Lieu de paiement :</strong></div>
-            <div class="arabic-text"><strong>مكان الدفع :</strong></div>
-        </div>
-        <ul>
-            <li>
-                <div class="french-text">Service des finances de la commune</div>
-                <div class="arabic-text">مصلحة المالية بالجماعة</div>
-            </li>
-            <li>
-                <div class="french-text">En ligne (si disponible)</div>
-                <div class="arabic-text">عبر الإنترنت (إن وجد)</div>
-            </li>
-            <li>
-                <div class="french-text">Guichet automatique</div>
-                <div class="arabic-text">الصراف الآلي</div>
-            </li>
-        </ul>
-        <div class="payment-methods">
-            <div class="french-text"><strong>Modes de paiement :</strong> Espèces, chèque, carte bancaire</div>
-            <div class="arabic-text"><strong>طرق الدفع :</strong> نقداً، شيك، بطاقة بنكية</div>
-        </div>
-=======
         <h4>💰 Paiement des taxes / دفع الضرائب :</h4>
         <p><strong>Lieu de paiement / مكان الدفع :</strong></p>
         <ul>
@@ -289,7 +143,6 @@ qa_pairs = [
             <li>Guichet automatique / الصراف الآلي</li>
         </ul>
         <p><strong>Modes de paiement / طرق الدفع :</strong> Espèces, chèque, carte bancaire / نقداً، شيك، بطاقة بنكية</p>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     </div>"""
     },
     
@@ -302,32 +155,6 @@ qa_pairs = [
             "حجز موعد", "حجز موعد؟", "موعد جماعة", "موعد جماعة؟", "rdv", "rdv جماعة", "rdv جماعة؟"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Prise de rendez-vous</h4>
-        <h4 class="arabic-title">حجز المواعيد</h4>
-        <div class="section-title">
-            <div class="french-text"><strong>Méthodes disponibles :</strong></div>
-            <div class="arabic-text"><strong>الطرق المتاحة :</strong></div>
-        </div>
-        <ul>
-            <li>
-                <div class="french-text">Par téléphone : Service d'accueil</div>
-                <div class="arabic-text">بالهاتف : مكتب الاستقبال</div>
-            </li>
-            <li>
-                <div class="french-text">Sur place : Guichet d'accueil</div>
-                <div class="arabic-text">في المكان : مكتب الاستقبال</div>
-            </li>
-            <li>
-                <div class="french-text">En ligne : Site web de la commune</div>
-                <div class="arabic-text">عبر الإنترنت : موقع الجماعة</div>
-            </li>
-        </ul>
-        <div class="appointment-hours">
-            <div class="french-text"><strong>Horaires de prise de RDV :</strong> 8h00 - 16h00 (Lun-Ven)</div>
-            <div class="arabic-text"><strong>أوقات حجز المواعيد :</strong> 8:00 صباحاً - 4:00 مساءً (الاثنين-الجمعة)</div>
-        </div>
-=======
         <h4>📅 Prise de rendez-vous / حجز المواعيد :</h4>
         <p><strong>Méthodes disponibles / الطرق المتاحة :</strong></p>
         <ul>
@@ -336,7 +163,6 @@ qa_pairs = [
             <li>En ligne / عبر الإنترنت : Site web de la commune / موقع الجماعة</li>
         </ul>
         <p><strong>Horaires de prise de RDV / أوقات حجز المواعيد :</strong> 8h00 - 16h00 (Lun-Ven) / 8:00 صباحاً - 4:00 مساءً (الاثنين-الجمعة)</p>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     </div>"""
     },
     
@@ -350,31 +176,6 @@ qa_pairs = [
             "chahadat zawaj"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Documents requis</h4>
-        <h4 class="arabic-title">الوثائق المطلوبة</h4>
-        <ul>
-            <li>
-                <div class="french-text">Formulaire de demande rempli et signé</div>
-                <div class="arabic-text">استمارة الطلب معبأة وموقعة</div>
-            </li>
-            <li>
-                <div class="french-text">Pièce d'identité nationale</div>
-                <div class="arabic-text">البطاقة الوطنية للتعريف</div>
-            </li>
-            <li>
-                <div class="french-text">Informations sur le mariage (date, lieu, noms des époux)</div>
-                <div class="arabic-text">معلومات عن الزواج (التاريخ، المكان، أسماء الزوجين)</div>
-            </li>
-            <li>
-                <div class="french-text">Livret de famille (si disponible)</div>
-                <div class="arabic-text">دفتر الحالة المدنية (إن وجد)</div>
-            </li>
-            <li>
-                <div class="french-text">Timbres fiscaux (15 dirhams)</div>
-                <div class="arabic-text">طوابع ضريبية (15 دراهم)</div>
-            </li>
-=======
         <h4>💒 Documents requis / الوثائق المطلوبة :</h4>
         <ul>
             <li>Formulaire de demande rempli et signé / استمارة الطلب معبأة وموقعة</li>
@@ -382,7 +183,6 @@ qa_pairs = [
             <li>Informations sur le mariage (date, lieu, noms des époux) / معلومات عن الزواج (التاريخ، المكان، أسماء الزوجين)</li>
             <li>Livret de famille (si disponible) / دفتر الحالة المدنية (إن وجد)</li>
             <li>Timbres fiscaux (15 dirhams) / طوابع ضريبية (15 دراهم)</li>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         </ul>
     </div>"""
     },
@@ -397,36 +197,6 @@ qa_pairs = [
             "خدمات عبر الانترنت", "services electroniques", "services electronique"
         ],
         "answer": """<div class="answer-section">
-<<<<<<< HEAD
-        <h4>Services en ligne disponibles</h4>
-        <h4 class="arabic-title">الخدمات الإلكترونية المتوفرة</h4>
-        <ul>
-            <li>
-                <div class="french-text">Demande d'actes d'état civil</div>
-                <div class="arabic-text">طلب وثائق الحالة المدنية</div>
-            </li>
-            <li>
-                <div class="french-text">Paiement des taxes municipales</div>
-                <div class="arabic-text">دفع الضرائب الجماعية</div>
-            </li>
-            <li>
-                <div class="french-text">Prise de rendez-vous</div>
-                <div class="arabic-text">حجز المواعيد</div>
-            </li>
-            <li>
-                <div class="french-text">Consultation des horaires</div>
-                <div class="arabic-text">استشارة الأوقات</div>
-            </li>
-            <li>
-                <div class="french-text">Téléchargement de formulaires</div>
-                <div class="arabic-text">تحميل الاستمارات</div>
-            </li>
-        </ul>
-        <div class="website-info">
-            <div class="french-text"><strong>Site web :</strong> Consultez le site officiel de la commune</div>
-            <div class="arabic-text"><strong>الموقع الإلكتروني :</strong> راجع الموقع الرسمي للجماعة</div>
-        </div>
-=======
         <h4>💻 Services en ligne disponibles / الخدمات الإلكترونية المتوفرة :</h4>
         <ul>
             <li>Demande d'actes d'état civil / طلب وثائق الحالة المدنية</li>
@@ -436,7 +206,6 @@ qa_pairs = [
             <li>Téléchargement de formulaires / تحميل الاستمارات</li>
         </ul>
         <p><strong>Site web / الموقع الإلكتروني :</strong> www.commune-fes.ma</p>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     </div>"""
     },
     
@@ -453,12 +222,8 @@ qa_pairs = [
         <h4>🧹 Signalement de problèmes / الإبلاغ عن المشاكل :</h4>
         <p><strong>Contactez le service d'hygiène / تواصل مع مصلحة النظافة :</strong></p>
         <ul>
-<<<<<<< HEAD
-            <li>Téléphone / الهاتف : Service d'hygiène</li>
-=======
             <li>Téléphone / الهاتف : 05 35 62 56 95</li>
             <li>Email / البريد الإلكتروني : hygiene@commune-fes.ma</li>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
             <li>Sur place / في المكان : Service d'hygiène / مصلحة النظافة</li>
         </ul>
         <p><strong>Types de problèmes / أنواع المشاكل :</strong> Déchets, saleté, éclairage défaillant / نفايات، قذارة، إضاءة معطلة</p>
@@ -477,18 +242,13 @@ qa_pairs = [
         "answer": """<div class="answer-section">
         <h4>🚨 Numéros d'urgence / أرقام الطوارئ :</h4>
         <ul>
-<<<<<<< HEAD
-            <li><strong>Commune de Fès / جماعة فاس :</strong> Service d'accueil</li>
-=======
             <li><strong>Commune de Fès / جماعة فاس :</strong> 05 35 62 56 95</li>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
             <li><strong>Police / الشرطة :</strong> 19</li>
             <li><strong>Pompiers / المطافئ :</strong> 15</li>
             <li><strong>Ambulance / الإسعاف :</strong> 15</li>
         </ul>
         <p><strong>Service 24h/24 / خدمة 24 ساعة :</strong> Oui / نعم</p>
     </div>"""
-<<<<<<< HEAD
     },
     # Certificat de décès
     {
@@ -669,8 +429,6 @@ qa_pairs = [
             <li><div class='french-text'>Pièce d'identité</div><div class='arabic-text'>بطاقة التعريف</div></li>
         </ul>
         </div>"""
-=======
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     }
 ]
 
@@ -713,7 +471,6 @@ def get_follow_up_question(intent, step=1):
     follow_ups = {
         'birth_certificate': {
             1: """<div class="answer-section">
-<<<<<<< HEAD
         <h4>Type d'acte de naissance</h4>
         <h4 class="arabic-title">نوع عقد الازدياد</h4>
         <div class="french-text">Pour quel type d'acte de naissance avez-vous besoin ?</div>
@@ -789,26 +546,6 @@ def get_follow_up_question(intent, step=1):
         <div class="french-text">Pour quel service souhaitez-vous un rendez-vous ?</div>
         <div class="arabic-text">ما الخدمة التي تريد موعداً لها؟</div>
     </div>"""
-=======
-    <div class="french-section">
-        <h4>📋 Type d'acte de naissance :</h4>
-        <p>Pour quel type d'acte de naissance avez-vous besoin ?</p>
-        <ul>
-            <li>Extrait simple</li>
-            <li>Copie intégrale</li>
-            <li>Acte avec mentions marginales</li>
-        </ul>
-    </div>
-    <div class="arabic-section">
-        <h4>📋 نوع عقد الازدياد :</h4>
-        <p>ما نوع عقد الازدياد الذي تحتاجه؟</p>
-        <ul>
-            <li>نسخة بسيطة</li>
-            <li>نسخة كاملة</li>
-            <li>عقد مع إشارات هامشية</li>
-        </ul>
-    </div>
-</div>"""
         },
         'national_id': {
             1: """<div class="answer-section">
@@ -893,7 +630,6 @@ def get_follow_up_question(intent, step=1):
         <p>ما الخدمة التي تريد موعداً لها؟</p>
     </div>
 </div>"""
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         }
     }
     
@@ -905,11 +641,8 @@ def process_conversation_step(user_input, intent, step):
             1: {
                 'extrait simple': """<div class="answer-section">
     <div class="french-section">
-<<<<<<< HEAD
         <h4>Extrait simple - Documents requis :</h4>
-=======
         <h4>📋 Extrait simple - Documents requis :</h4>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         <ul>
             <li>Formulaire de demande</li>
             <li>Pièce d'identité</li>
@@ -918,11 +651,8 @@ def process_conversation_step(user_input, intent, step):
         <p><strong>Durée de traitement :</strong> 2-3 jours</p>
     </div>
     <div class="arabic-section">
-<<<<<<< HEAD
         <h4>نسخة بسيطة - الوثائق المطلوبة :</h4>
-=======
         <h4>📋 نسخة بسيطة - الوثائق المطلوبة :</h4>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         <ul>
             <li>استمارة الطلب</li>
             <li>بطاقة التعريف</li>
@@ -933,11 +663,8 @@ def process_conversation_step(user_input, intent, step):
 </div>""",
                 'copie intégrale': """<div class="answer-section">
     <div class="french-section">
-<<<<<<< HEAD
         <h4>Copie intégrale - Documents requis :</h4>
-=======
         <h4>📋 Copie intégrale - Documents requis :</h4>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         <ul>
             <li>Formulaire de demande</li>
             <li>Pièce d'identité</li>
@@ -947,11 +674,8 @@ def process_conversation_step(user_input, intent, step):
         <p><strong>Durée de traitement :</strong> 3-5 jours</p>
     </div>
     <div class="arabic-section">
-<<<<<<< HEAD
         <h4>نسخة كاملة - الوثائق المطلوبة :</h4>
-=======
         <h4>📋 نسخة كاملة - الوثائق المطلوبة :</h4>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         <ul>
             <li>استمارة الطلب</li>
             <li>بطاقة التعريف</li>
@@ -963,11 +687,8 @@ def process_conversation_step(user_input, intent, step):
 </div>""",
                 'acte avec mentions marginales': """<div class="answer-section">
     <div class="french-section">
-<<<<<<< HEAD
         <h4>Acte avec mentions - Documents requis :</h4>
-=======
         <h4>📋 Acte avec mentions - Documents requis :</h4>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         <ul>
             <li>Formulaire de demande</li>
             <li>Pièce d'identité</li>
@@ -978,11 +699,8 @@ def process_conversation_step(user_input, intent, step):
         <p><strong>Durée de traitement :</strong> 5-7 jours</p>
     </div>
     <div class="arabic-section">
-<<<<<<< HEAD
         <h4>عقد مع إشارات - الوثائق المطلوبة :</h4>
-=======
         <h4>📋 عقد مع إشارات - الوثائق المطلوبة :</h4>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         <ul>
             <li>استمارة الطلب</li>
             <li>بطاقة التعريف</li>
@@ -995,19 +713,16 @@ def process_conversation_step(user_input, intent, step):
 </div>""",
                 'default': """<div class="answer-section">
     <div class="french-section">
-<<<<<<< HEAD
         <h4>Aide pour l'acte de naissance :</h4>
         <p>Je vais vous guider pour obtenir votre acte de naissance. Pouvez-vous me préciser le type d'acte dont vous avez besoin ?</p>
     </div>
     <div class="arabic-section">
         <h4>مساعدة لعقد الازدياد :</h4>
-=======
         <h4>📋 Aide pour l'acte de naissance :</h4>
         <p>Je vais vous guider pour obtenir votre acte de naissance. Pouvez-vous me préciser le type d'acte dont vous avez besoin ?</p>
     </div>
     <div class="arabic-section">
         <h4>📋 مساعدة لعقد الازدياد :</h4>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
         <p>سأرشدك للحصول على عقد الازدياد. هل يمكنك تحديد نوع العقد الذي تحتاجه؟</p>
     </div>
 </div>"""
@@ -1345,8 +1060,6 @@ def find_answer(question, session_id):
     }
 
 # ===== SESSION MANAGEMENT =====
-<<<<<<< HEAD
-=======
 def check_rate_limit(session_id, limit=20, window=300):  # 20 requests per 5 minutes
     """Simple rate limiting by session ID"""
     now = time.time()
@@ -1365,7 +1078,6 @@ def check_rate_limit(session_id, limit=20, window=300):  # 20 requests per 5 min
     rate_limit_storage[session_id].append(now)
     return True
 
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
 def get_session_id():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
@@ -1384,15 +1096,12 @@ def get_theme_icon(theme):
 
 def get_font_size_icon(font_size):
     icons = {
-<<<<<<< HEAD
         'normal': '🔍',
         'large': '🔍',
-        'xlarge': '🔍'
-=======
+        'xlarge': '🔍',
         'normal': '📝',
         'large': '🔍',
         'xlarge': '🔎'
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
     }
     return icons.get(font_size, '📝')
 
@@ -1426,7 +1135,6 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-<<<<<<< HEAD
     session_id = get_session_id()
     question = request.form.get('question', '')
     
@@ -1468,7 +1176,6 @@ def chat():
                          theme_icon=get_theme_icon(prefs['theme']),
                          font_size_icon=get_font_size_icon(prefs['font_size']),
                          font_size_tooltip=get_font_size_tooltip(prefs['font_size']))
-=======
     try:
         session_id = get_session_id()
         
@@ -1525,7 +1232,6 @@ def chat():
         # Log error in production, for now just redirect
         print(f"Error in chat route: {e}")
         return redirect(url_for('index'))
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
 
 @app.route('/clear_chat', methods=['POST'])
 def clear_chat():
@@ -1564,8 +1270,5 @@ def toggle_font_size():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     app.run(debug=True, host='0.0.0.0', port=5000) 
-=======
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000))) 
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
