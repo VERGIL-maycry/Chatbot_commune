@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Chatbot - Commune de Fès</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <!-- ===== MAIN CHAT CONTAINER ===== -->
+    <div class="chat-container">
+        <!-- ===== CHAT HEADER ===== -->
+        <div class="chat-header">
+            <span>Chatbot - Commune de Fès</span>
+            <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+                <form method="POST" action="{{ url_for('clear_chat') }}" style="margin: 0;">
+                    <input type="hidden" name="session_id" value="{{ session_id }}">
+                    <button type="submit" 
+                            style="background: none; border: none; color: #fff; font-size: 1.1em; cursor: pointer; padding: 0 8px;" 
+                            title="Effacer l'historique" aria-label="Effacer l'historique">
+                        🗑️
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('toggle_font_size') }}" style="margin: 0;">
+                    <input type="hidden" name="session_id" value="{{ session_id }}">
+                    <button type="submit" 
+                            style="background: none; border: none; color: #fff; font-size: 1.2em; cursor: pointer; padding: 0 8px;" 
+                            title="{{ font_size_tooltip }}" aria-label="Changer la taille de police">
+                        {{ font_size_icon }}
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('toggle_theme') }}" style="margin: 0;">
+                    <input type="hidden" name="session_id" value="{{ session_id }}">
+                    <button type="submit" 
+                            style="background: none; border: none; color: #fff; font-size: 1.2em; cursor: pointer; padding: 0 8px;" 
+                            title="Changer le thème" aria-label="Changer le thème">
+                        {{ theme_icon }}
+                    </button>
+                </form>
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Commune_de_F%C3%A9s.png" 
+                     alt="Logo Commune de Fès" 
+                     style="height: 36px; width: auto; background: #fff; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);" />
+            </div>
+        </div>
+        
+        <!-- ===== CHAT MESSAGES AREA ===== -->
+        <div class="chat-messages" id="chatMessages">
+            {% for message in chat_history %}
+                <div class="message {{ message.sender }}">
+                    {{ message.text | safe }}
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- ===== QUICK REPLY BUTTONS ===== -->
+        {% if not in_conversation %}
+        <div class="quick-replies">
+            <form method="POST" action="{{ url_for('chat') }}" style="display: inline;">
+                <input type="hidden" name="session_id" value="{{ session_id }}">
+                <button type="submit" name="question" value="Horaires d'ouverture" class="quick-reply-btn">Horaires</button>
+                <button type="submit" name="question" value="Adresse de la mairie" class="quick-reply-btn">Adresse</button>
+                <button type="submit" name="question" value="Certificat de résidence" class="quick-reply-btn">Certificat résidence</button>
+                <button type="submit" name="question" value="Acte de naissance" class="quick-reply-btn">Acte naissance</button>
+                <button type="submit" name="question" value="Carte d'identité nationale" class="quick-reply-btn">CNI</button>
+                <button type="submit" name="question" value="Passeport" class="quick-reply-btn">Passeport</button>
+            </form>
+        </div>
+        {% else %}
+        <div class="conversation-replies">
+            <form method="POST" action="{{ url_for('chat') }}" style="display: inline;">
+                <input type="hidden" name="session_id" value="{{ session_id }}">
+                {% for button in conversation_buttons %}
+                    <button type="submit" name="question" value="{{ button.value }}" class="quick-reply-btn">{{ button.text }}</button>
+                {% endfor %}
+            </form>
+        </div>
+        {% endif %}
+        
+
+        
+        <!-- ===== CHAT INPUT FORM ===== -->
+        <form class="chat-input" method="POST" action="{{ url_for('chat') }}">
+            <input type="hidden" name="session_id" value="{{ session_id }}">
+            <div class="input-container">
+                <input type="text" name="question" id="chatInput" placeholder="Écrivez votre question..." autocomplete="off" required />
+                <div class="suggestions-dropup" id="suggestionsDropup">
+                    <div class="suggestions-list" id="suggestionsList">
+                        <!-- Suggestions will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+
+    <script>
+        // Suggestions data
+        const suggestions = [
+            { text: "Horaires d'ouverture", icon: "", category: "Informations générales" },
+            { text: "Adresse de la mairie", icon: "", category: "Informations générales" },
+            { text: "Certificat de résidence", icon: "", category: "Documents" },
+            { text: "Acte de naissance", icon: "", category: "Documents" },
+            { text: "Carte d'identité nationale", icon: "", category: "Documents" },
+            { text: "Passeport", icon: "", category: "Documents" },
+            { text: "Certificat de mariage", icon: "", category: "Documents" },
+            { text: "Taxes municipales", icon: "", category: "Services" },
+            { text: "Prise de rendez-vous", icon: "", category: "Services" },
+            { text: "Services en ligne", icon: "", category: "Services" },
+            { text: "Propreté (signaler un problème)", icon: "", category: "Services" },
+            { text: "Numéro d'urgence", icon: "", category: "Informations générales" },
+            { text: "Certificat de décès", icon: "", category: "Documents" },
+            { text: "Permis de conduire", icon: "", category: "Documents" },
+            { text: "Déclaration de travaux", icon: "", category: "Services" },
+            { text: "Certificat d'urbanisme", icon: "", category: "Services" },
+            { text: "Autorisation de stationnement", icon: "", category: "Services" },
+            { text: "Certificat de conformité", icon: "", category: "Services" },
+            { text: "Attestation de domiciliation", icon: "", category: "Documents" },
+            { text: "Copie d'acte", icon: "", category: "Documents" },
+            { text: "Légalisation de signature", icon: "", category: "Services" },
+            { text: "Certificat de nationalité", icon: "", category: "Documents" },
+            { text: "Attestation de résidence", icon: "", category: "Documents" },
+            { text: "Certificat de célibat", icon: "", category: "Documents" }
+        ];
+
+        // Apply theme and font size from server-side preferences
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get user preferences from server (these would be passed as template variables)
+            // For now, we'll use the default dark theme and normal font size
+            // In a real implementation, these would be passed from Flask
+            
+            // Apply theme class if needed
+            const theme = '{{ theme }}' || 'dark';
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+            }
+            
+            // Apply font size
+            const fontSize = '{{ font_size }}' || 'normal';
+            if (fontSize !== 'normal') {
+                document.body.setAttribute('data-font-size', fontSize);
+            }
+            
+            // Auto-scroll to bottom of chat messages with a small delay to prevent jumping
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 100);
+            }
+
+            // Initialize suggestions functionality
+            initializeSuggestions();
+        });
+
+        // Suggestions functionality
+        function initializeSuggestions() {
+            const chatInput = document.getElementById('chatInput');
+            const suggestionsDropup = document.getElementById('suggestionsDropup');
+            const suggestionsList = document.getElementById('suggestionsList');
+            let selectedIndex = -1;
+            let filteredSuggestions = [];
+
+            // Show suggestions when user starts typing
+            chatInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                
+                if (query.length < 2) {
+                    hideSuggestions();
+                    return;
+                }
+
+                // Filter suggestions based on input
+                filteredSuggestions = suggestions.filter(suggestion => 
+                    suggestion.text.toLowerCase().includes(query) ||
+                    suggestion.category.toLowerCase().includes(query)
+                );
+
+                if (filteredSuggestions.length > 0) {
+                    showSuggestions(filteredSuggestions);
+                } else {
+                    hideSuggestions();
+                }
+            });
+
+            // Handle keyboard navigation
+            chatInput.addEventListener('keydown', function(e) {
+                if (!suggestionsDropup.classList.contains('show')) return;
+
+                switch(e.key) {
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        navigateSuggestions(-1);
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        navigateSuggestions(1);
+                        break;
+                    case 'Enter':
+                        if (selectedIndex >= 0 && filteredSuggestions[selectedIndex]) {
+                            e.preventDefault();
+                            selectSuggestion(filteredSuggestions[selectedIndex]);
+                        }
+                        break;
+                    case 'Escape':
+                        hideSuggestions();
+                        break;
+                }
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!chatInput.contains(e.target) && !suggestionsDropup.contains(e.target)) {
+                    hideSuggestions();
+                }
+            });
+
+            function showSuggestions(suggestionsToShow) {
+                suggestionsList.innerHTML = '';
+                selectedIndex = -1;
+
+                suggestionsToShow.forEach((suggestion, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.innerHTML = `
+                        <span class="suggestion-icon">${suggestion.icon}</span>
+                        <span class="suggestion-text">${suggestion.text}</span>
+                        <span class="suggestion-category">${suggestion.category}</span>
+                    `;
+                    
+                    item.addEventListener('click', () => selectSuggestion(suggestion));
+                    item.addEventListener('mouseenter', () => {
+                        selectedIndex = index;
+                        updateSelection();
+                    });
+                    
+                    suggestionsList.appendChild(item);
+                });
+
+                suggestionsDropup.classList.add('show');
+            }
+
+            function hideSuggestions() {
+                suggestionsDropup.classList.remove('show');
+                selectedIndex = -1;
+            }
+
+            function navigateSuggestions(direction) {
+                if (filteredSuggestions.length === 0) return;
+
+                selectedIndex += direction;
+                
+                if (selectedIndex >= filteredSuggestions.length) {
+                    selectedIndex = 0;
+                } else if (selectedIndex < 0) {
+                    selectedIndex = filteredSuggestions.length - 1;
+                }
+
+                updateSelection();
+            }
+
+            function updateSelection() {
+                const items = suggestionsList.querySelectorAll('.suggestion-item');
+                items.forEach((item, index) => {
+                    item.classList.toggle('selected', index === selectedIndex);
+                });
+
+                // Scroll to selected item if needed
+                if (selectedIndex >= 0) {
+                    const selectedItem = items[selectedIndex];
+                    if (selectedItem) {
+                        selectedItem.scrollIntoView({ block: 'nearest' });
+                    }
+                }
+            }
+
+            function selectSuggestion(suggestion) {
+                chatInput.value = suggestion.text;
+                hideSuggestions();
+                chatInput.focus();
+            }
+        }
+    </script>
+</body>
+</html> 
