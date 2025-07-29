@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# Chatbot - Commune de Fès (Python Version)
+Chatbot - Commune de Fès (Python Version)
 
 A bilingual chatbot for the municipality of Fès (Morocco) built with Python Flask, providing information about municipal services and documents in French and Arabic.
 
