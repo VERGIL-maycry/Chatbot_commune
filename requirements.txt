@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 Flask==2.3.3
 Werkzeug==2.3.7 
+=======
+Flask==2.3.3
+Werkzeug==2.3.7
+gunicorn==21.2.0 
+>>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
