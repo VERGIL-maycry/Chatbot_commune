@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,8 +6,12 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Assistant virtuel de la Commune de Fès - Services administratifs et informations municipales">
+    <meta name="robots" content="index, follow">
     <title>Chatbot - Commune de Fès</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMyRTg2QzEiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNURBREUyIi8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNiIgZmlsbD0idXJsKCNncmFkKSIvPgo8dGV4dCB4PSI3IiB5PSIyMiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPtmBPC90ZXh0Pgo8L3N2Zz4K">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -16,38 +19,36 @@
     <div class="chat-container">
         <!-- ===== CHAT HEADER ===== -->
         <div class="chat-header">
-            <span>Chatbot - Commune de Fès</span>
-            <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+            <div class="header-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Commune_de_F%C3%A9s.png" 
+                     alt="Logo Commune de Fès" 
+                     class="logo-image" />
+                <div class="header-text">
+                    <h1>مساعد الجماعة الافتراضي</h1>
+                    <span>Assistant virtuel - Commune de Fès</span>
+                </div>
+            </div>
+            <div class="header-controls">
                 <form method="POST" action="{{ url_for('clear_chat') }}" style="margin: 0;">
                     <input type="hidden" name="session_id" value="{{ session_id }}">
-                    <button type="submit" 
-                            style="background: none; border: none; color: #fff; font-size: 1.1em; cursor: pointer; padding: 0 8px;" 
-                            title="Effacer l'historique" aria-label="Effacer l'historique">
+                    <button type="submit" class="control-btn" title="Effacer l'historique" aria-label="Effacer l'historique">
                         🗑️
                     </button>
                 </form>
                 
                 <form method="POST" action="{{ url_for('toggle_font_size') }}" style="margin: 0;">
                     <input type="hidden" name="session_id" value="{{ session_id }}">
-                    <button type="submit" 
-                            style="background: none; border: none; color: #fff; font-size: 1.2em; cursor: pointer; padding: 0 8px;" 
-                            title="{{ font_size_tooltip }}" aria-label="Changer la taille de police">
+                    <button type="submit" class="control-btn" title="{{ font_size_tooltip }}" aria-label="Changer la taille de police">
                         {{ font_size_icon }}
                     </button>
                 </form>
                 
                 <form method="POST" action="{{ url_for('toggle_theme') }}" style="margin: 0;">
                     <input type="hidden" name="session_id" value="{{ session_id }}">
-                    <button type="submit" 
-                            style="background: none; border: none; color: #fff; font-size: 1.2em; cursor: pointer; padding: 0 8px;" 
-                            title="Changer le thème" aria-label="Changer le thème">
+                    <button type="submit" class="control-btn" title="Changer le thème" aria-label="Changer le thème">
                         {{ theme_icon }}
                     </button>
                 </form>
-                
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Commune_de_F%C3%A9s.png" 
-                     alt="Logo Commune de Fès" 
-                     style="height: 36px; width: auto; background: #fff; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);" />
             </div>
         </div>
         
@@ -65,12 +66,12 @@
         <div class="quick-replies">
             <form method="POST" action="{{ url_for('chat') }}" style="display: inline;">
                 <input type="hidden" name="session_id" value="{{ session_id }}">
-                <button type="submit" name="question" value="Horaires d'ouverture" class="quick-reply-btn">Horaires</button>
-                <button type="submit" name="question" value="Adresse de la mairie" class="quick-reply-btn">Adresse</button>
-                <button type="submit" name="question" value="Certificat de résidence" class="quick-reply-btn">Certificat résidence</button>
-                <button type="submit" name="question" value="Acte de naissance" class="quick-reply-btn">Acte naissance</button>
-                <button type="submit" name="question" value="Carte d'identité nationale" class="quick-reply-btn">CNI</button>
-                <button type="submit" name="question" value="Passeport" class="quick-reply-btn">Passeport</button>
+                <button type="submit" name="question" value="Horaires d'ouverture" class="quick-reply-btn">⏰ Horaires</button>
+                <button type="submit" name="question" value="Adresse de la mairie" class="quick-reply-btn">📍 Adresse</button>
+                <button type="submit" name="question" value="Certificat de résidence" class="quick-reply-btn">🏠 Certificat résidence</button>
+                <button type="submit" name="question" value="Acte de naissance" class="quick-reply-btn">📋 Acte naissance</button>
+                <button type="submit" name="question" value="Carte d'identité nationale" class="quick-reply-btn">🆔 CNI</button>
+                <button type="submit" name="question" value="Passeport" class="quick-reply-btn">📘 Passeport</button>
             </form>
         </div>
         {% else %}
@@ -84,58 +85,52 @@
         </div>
         {% endif %}
         
-
-        
         <!-- ===== CHAT INPUT FORM ===== -->
         <form class="chat-input" method="POST" action="{{ url_for('chat') }}">
             <input type="hidden" name="session_id" value="{{ session_id }}">
             <div class="input-container">
-                <input type="text" name="question" id="chatInput" placeholder="Écrivez votre question..." autocomplete="off" required />
+                <input type="text" name="question" id="chatInput" placeholder="اكتب سؤالك هنا... Écrivez votre question..." autocomplete="off" required />
                 <div class="suggestions-dropup" id="suggestionsDropup">
                     <div class="suggestions-list" id="suggestionsList">
                         <!-- Suggestions will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
-            <button type="submit">Envoyer</button>
+            <button type="submit" class="send-btn">📤 إرسال</button>
         </form>
     </div>
 
     <script>
         // Suggestions data
         const suggestions = [
-            { text: "Horaires d'ouverture", icon: "", category: "Informations générales" },
-            { text: "Adresse de la mairie", icon: "", category: "Informations générales" },
-            { text: "Certificat de résidence", icon: "", category: "Documents" },
-            { text: "Acte de naissance", icon: "", category: "Documents" },
-            { text: "Carte d'identité nationale", icon: "", category: "Documents" },
-            { text: "Passeport", icon: "", category: "Documents" },
-            { text: "Certificat de mariage", icon: "", category: "Documents" },
-            { text: "Taxes municipales", icon: "", category: "Services" },
-            { text: "Prise de rendez-vous", icon: "", category: "Services" },
-            { text: "Services en ligne", icon: "", category: "Services" },
-            { text: "Propreté (signaler un problème)", icon: "", category: "Services" },
-            { text: "Numéro d'urgence", icon: "", category: "Informations générales" },
-            { text: "Certificat de décès", icon: "", category: "Documents" },
-            { text: "Permis de conduire", icon: "", category: "Documents" },
-            { text: "Déclaration de travaux", icon: "", category: "Services" },
-            { text: "Certificat d'urbanisme", icon: "", category: "Services" },
-            { text: "Autorisation de stationnement", icon: "", category: "Services" },
-            { text: "Certificat de conformité", icon: "", category: "Services" },
-            { text: "Attestation de domiciliation", icon: "", category: "Documents" },
-            { text: "Copie d'acte", icon: "", category: "Documents" },
-            { text: "Légalisation de signature", icon: "", category: "Services" },
-            { text: "Certificat de nationalité", icon: "", category: "Documents" },
-            { text: "Attestation de résidence", icon: "", category: "Documents" },
-            { text: "Certificat de célibat", icon: "", category: "Documents" }
+            { text: "Horaires d'ouverture", icon: "⏰", category: "Informations générales" },
+            { text: "Adresse de la mairie", icon: "📍", category: "Informations générales" },
+            { text: "Certificat de résidence", icon: "🏠", category: "Documents" },
+            { text: "Acte de naissance", icon: "📋", category: "Documents" },
+            { text: "Carte d'identité nationale", icon: "🆔", category: "Documents" },
+            { text: "Passeport", icon: "📘", category: "Documents" },
+            { text: "Certificat de mariage", icon: "💒", category: "Documents" },
+            { text: "Taxes municipales", icon: "💰", category: "Services" },
+            { text: "Prise de rendez-vous", icon: "📅", category: "Services" },
+            { text: "Services en ligne", icon: "💻", category: "Services" },
+            { text: "Propreté (signaler un problème)", icon: "🧹", category: "Services" },
+            { text: "Numéro d'urgence", icon: "🚨", category: "Informations générales" },
+            { text: "Certificat de décès", icon: "⚱️", category: "Documents" },
+            { text: "Permis de conduire", icon: "🚗", category: "Documents" },
+            { text: "Déclaration de travaux", icon: "🔨", category: "Services" },
+            { text: "Certificat d'urbanisme", icon: "🏗️", category: "Services" },
+            { text: "Autorisation de stationnement", icon: "🅿️", category: "Services" },
+            { text: "Certificat de conformité", icon: "✅", category: "Services" },
+            { text: "Attestation de domiciliation", icon: "🏡", category: "Documents" },
+            { text: "Copie d'acte", icon: "📑", category: "Documents" },
+            { text: "Légalisation de signature", icon: "✍️", category: "Services" },
+            { text: "Certificat de nationalité", icon: "🇲🇦", category: "Documents" },
+            { text: "Attestation de résidence", icon: "🏠", category: "Documents" },
+            { text: "Certificat de célibat", icon: "👤", category: "Documents" }
         ];
 
         // Apply theme and font size from server-side preferences
         document.addEventListener('DOMContentLoaded', function() {
-            // Get user preferences from server (these would be passed as template variables)
-            // For now, we'll use the default dark theme and normal font size
-            // In a real implementation, these would be passed from Flask
-            
             // Apply theme class if needed
             const theme = '{{ theme }}' || 'dark';
             if (theme === 'light') {
@@ -148,7 +143,7 @@
                 document.body.setAttribute('data-font-size', fontSize);
             }
             
-            // Auto-scroll to bottom of chat messages with a small delay to prevent jumping
+            // Auto-scroll to bottom of chat messages
             const chatMessages = document.getElementById('chatMessages');
             if (chatMessages) {
                 setTimeout(() => {
@@ -289,128 +284,4 @@
         }
     </script>
 </body>
-=======
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Assistant virtuel de la Commune de Fès - Services administratifs et informations municipales">
-    <meta name="robots" content="index, follow">
-    <title>Chatbot - Commune de Fès</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzY2N2VlYSIvPgo8dGV4dCB4PSI1IiB5PSIyMiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmaWxsPSJ3aGl0ZSI+QzwvdGV4dD4KPC9zdmc+">
-</head>
-
-<body>
-    <!-- ===== MAIN CHAT CONTAINER ===== -->
-    <div class="chat-container">
-        <!-- ===== CHAT HEADER ===== -->
-        <div class="chat-header">
-            <span>Chatbot - Commune de Fès</span>
-            <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
-                <form method="POST" action="{{ url_for('clear_chat') }}" style="margin: 0;">
-                    <input type="hidden" name="session_id" value="{{ session_id }}">
-                    <button type="submit" 
-                            style="background: none; border: none; color: #fff; font-size: 1.1em; cursor: pointer; padding: 0 8px;" 
-                            title="Effacer l'historique" aria-label="Effacer l'historique">
-                        🗑️
-                    </button>
-                </form>
-                
-                <form method="POST" action="{{ url_for('toggle_font_size') }}" style="margin: 0;">
-                    <input type="hidden" name="session_id" value="{{ session_id }}">
-                    <button type="submit" 
-                            style="background: none; border: none; color: #fff; font-size: 1.2em; cursor: pointer; padding: 0 8px;" 
-                            title="{{ font_size_tooltip }}" aria-label="Changer la taille de police">
-                        {{ font_size_icon }}
-                    </button>
-                </form>
-                
-                <form method="POST" action="{{ url_for('toggle_theme') }}" style="margin: 0;">
-                    <input type="hidden" name="session_id" value="{{ session_id }}">
-                    <button type="submit" 
-                            style="background: none; border: none; color: #fff; font-size: 1.2em; cursor: pointer; padding: 0 8px;" 
-                            title="Changer le thème" aria-label="Changer le thème">
-                        {{ theme_icon }}
-                    </button>
-                </form>
-                
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Commune_de_F%C3%A9s.png" 
-                     alt="Logo Commune de Fès" 
-                     style="height: 36px; width: auto; background: #fff; border-radius: 6px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);" />
-            </div>
-        </div>
-        
-        <!-- ===== CHAT MESSAGES AREA ===== -->
-        <div class="chat-messages" id="chatMessages">
-            {% for message in chat_history %}
-                <div class="message {{ message.sender }}">
-                    {{ message.text | safe }}
-                </div>
-            {% endfor %}
-        </div>
-        
-        <!-- ===== QUICK REPLY BUTTONS ===== -->
-        {% if not in_conversation %}
-        <div class="quick-replies">
-            <form method="POST" action="{{ url_for('chat') }}" style="display: inline;">
-                <input type="hidden" name="session_id" value="{{ session_id }}">
-                <button type="submit" name="question" value="Horaires d'ouverture" class="quick-reply-btn">Horaires</button>
-                <button type="submit" name="question" value="Adresse de la mairie" class="quick-reply-btn">Adresse</button>
-                <button type="submit" name="question" value="Certificat de résidence" class="quick-reply-btn">Certificat résidence</button>
-                <button type="submit" name="question" value="Acte de naissance" class="quick-reply-btn">Acte naissance</button>
-                <button type="submit" name="question" value="Carte d'identité nationale" class="quick-reply-btn">CNI</button>
-                <button type="submit" name="question" value="Passeport" class="quick-reply-btn">Passeport</button>
-            </form>
-        </div>
-        {% else %}
-        <div class="conversation-replies">
-            <form method="POST" action="{{ url_for('chat') }}" style="display: inline;">
-                <input type="hidden" name="session_id" value="{{ session_id }}">
-                {% for button in conversation_buttons %}
-                    <button type="submit" name="question" value="{{ button.value }}" class="quick-reply-btn">{{ button.text }}</button>
-                {% endfor %}
-            </form>
-        </div>
-        {% endif %}
-        
-        <!-- ===== CHAT INPUT FORM ===== -->
-        <form class="chat-input" method="POST" action="{{ url_for('chat') }}">
-            <input type="hidden" name="session_id" value="{{ session_id }}">
-            <input type="text" name="question" placeholder="Écrivez votre question..." autocomplete="off" required />
-            <button type="submit">Envoyer</button>
-        </form>
-    </div>
-
-    <script>
-        // Apply theme and font size from server-side preferences
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get user preferences from server (these would be passed as template variables)
-            // For now, we'll use the default dark theme and normal font size
-            // In a real implementation, these would be passed from Flask
-            
-            // Apply theme class if needed
-            const theme = '{{ theme }}' || 'dark';
-            if (theme === 'light') {
-                document.body.classList.add('light-theme');
-            }
-            
-            // Apply font size
-            const fontSize = '{{ font_size }}' || 'normal';
-            if (fontSize !== 'normal') {
-                document.body.setAttribute('data-font-size', fontSize);
-            }
-            
-            // Auto-scroll to bottom of chat messages with a small delay to prevent jumping
-            const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages) {
-                setTimeout(() => {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 100);
-            }
-        });
-    </script>
-</body>
->>>>>>> 093936b2bae542bafb8b7ca5b84a6be72f64879c
 </html> 
