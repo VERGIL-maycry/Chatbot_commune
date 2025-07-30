@@ -272,6 +272,43 @@
                 
                 if (!question) return;
 
+                sendMessage(question);
+            });
+
+            // Handle quick reply button clicks (for both initial and dynamically created buttons)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('quick-reply-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    let question = e.target.getAttribute('data-question');
+                    
+                    // If no data-question attribute, extract from text content
+                    if (!question) {
+                        question = e.target.textContent.replace(/^[^\s]*\s/, '').trim(); // Remove emoji and get text
+                    }
+                    
+                    console.log('Quick reply clicked:', question); // Debug log
+                    
+                    if (!question) {
+                        console.error('No question found for button:', e.target);
+                        return;
+                    }
+                    
+                    // Trigger the same flow as manual form submission
+                    sendMessage(question);
+                }
+            });
+
+            function sendMessage(question) {
+                console.log('Sending message:', question); // Debug log
+                
+                // Validate question
+                if (!question || question.trim() === '') {
+                    console.error('Empty question provided to sendMessage');
+                    return;
+                }
+                
                 // Disable form while processing
                 sendButton.disabled = true;
                 sendButton.textContent = '⏳ إرسال...';
@@ -283,7 +320,9 @@
 
                 // Hide suggestions
                 const suggestionsDropup = document.getElementById('suggestionsDropup');
-                suggestionsDropup.classList.remove('show');
+                if (suggestionsDropup) {
+                    suggestionsDropup.classList.remove('show');
+                }
 
                 // Send AJAX request
                 fetch('/chat_ajax', {
@@ -296,8 +335,12 @@
                         question: question
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status); // Debug log
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Response data:', data); // Debug log
                     if (data.success) {
                         // Add bot response to chat
                         addMessageToChat('bot', data.bot_response);
@@ -310,7 +353,7 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error('AJAX Error:', error);
                     addMessageToChat('bot', '<div class="answer-section"><p>عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.</p><p>Désolé, erreur de connexion. Veuillez réessayer.</p></div>');
                 })
                 .finally(() => {
@@ -320,19 +363,7 @@
                     chatInput.disabled = false;
                     chatInput.focus();
                 });
-            });
-
-            // Handle quick reply button clicks
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('quick-reply-btn')) {
-                    e.preventDefault();
-                    const question = e.target.getAttribute('data-question') || e.target.textContent.trim();
-                    
-                    // Set input value and submit
-                    chatInput.value = question;
-                    chatForm.dispatchEvent(new Event('submit'));
-                }
-            });
+            }
 
             function addMessageToChat(sender, text) {
                 const messageDiv = document.createElement('div');
@@ -384,6 +415,17 @@
                         buttonElement.className = 'quick-reply-btn';
                         buttonElement.setAttribute('data-question', button.value);
                         buttonElement.textContent = button.text;
+                        
+                        // Add click handler for dynamically created buttons
+                        buttonElement.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const question = this.getAttribute('data-question') || this.textContent.trim();
+                            if (question) {
+                                sendMessage(question);
+                            }
+                        });
+                        
                         form.appendChild(buttonElement);
                     });
                     
@@ -412,6 +454,17 @@
                         buttonElement.className = 'quick-reply-btn';
                         buttonElement.setAttribute('data-question', button.value);
                         buttonElement.textContent = button.text;
+                        
+                        // Add click handler for dynamically created buttons
+                        buttonElement.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const question = this.getAttribute('data-question') || this.textContent.replace(/^[^\s]*\s/, '').trim();
+                            if (question) {
+                                sendMessage(question);
+                            }
+                        });
+                        
                         form.appendChild(buttonElement);
                     });
                     
