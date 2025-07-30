@@ -178,10 +178,24 @@ body.light-theme .chat-input button:hover {
     background: rgba(46, 134, 193, 0.1);
     border: 1px solid rgba(46, 134, 193, 0.2);
     width: 100%;
+    min-height: auto;
+    height: auto;
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(46, 134, 193, 0.1);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    flex-shrink: 0;
+}
+
+/* Ensure proper text content display */
+.answer-section p,
+.answer-section ul,
+.answer-section li,
+.answer-section h4 {
+    width: 100%;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* Decorative corner elements for answer sections */
@@ -551,8 +565,8 @@ body[data-font-size="xlarge"] .answer-section {
 
 /* ===== CHAT MESSAGES ===== */
 .chat-messages {
-    flex: 1 1 0;
-    min-height: 0;
+    flex: 1 1 auto;
+    min-height: 200px;
     padding: 24px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -589,15 +603,20 @@ body[data-font-size="xlarge"] .answer-section {
 /* ===== MESSAGE STYLES ===== */
 .message {
     max-width: 82%;
+    min-height: auto;
+    height: auto;
     padding: 16px 22px;
     border-radius: 20px;
     font-size: 16px;
     line-height: 1.6;
     word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
     position: relative;
     animation: messageSlideIn 0.4s ease-out;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    flex-shrink: 0;
 }
 
 .message.user {
@@ -1052,6 +1071,9 @@ body.light-theme .suggestions-dropup::-webkit-scrollbar-thumb:hover {
         word-break: break-word;
         overflow-wrap: break-word;
         hyphens: auto;
+        flex-shrink: 0;
+        min-height: auto;
+        height: auto;
     }
     
     /* Ensure quick reply buttons don't cause horizontal scroll */
