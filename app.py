@@ -1150,47 +1150,6 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    session_id = get_session_id()
-    question = request.form.get('question', '')
-    
-    if not question.strip():
-        return redirect(url_for('index'))
-    
-    # Get response from chatbot
-    response = find_answer(question, session_id)
-    
-    # Update chat history in session
-    chat_history = session.get('chat_history', [])
-    chat_history.append({
-        'sender': 'user',
-        'text': question,
-        'timestamp': datetime.now().isoformat()
-    })
-    chat_history.append({
-        'sender': 'bot',
-        'text': response['answer'],
-        'timestamp': datetime.now().isoformat()
-    })
-    
-    # Keep only last 20 messages
-    if len(chat_history) > 20:
-        chat_history = chat_history[-20:]
-    
-    session['chat_history'] = chat_history
-    
-    # Get user preferences
-    prefs = get_user_preferences(session_id)
-    
-    return render_template('index.html',
-                         session_id=session_id,
-                         chat_history=chat_history,
-                         in_conversation=response['in_conversation'],
-                         conversation_buttons=response['buttons'],
-                         theme=prefs['theme'],
-                         font_size=prefs['font_size'],
-                         theme_icon=get_theme_icon(prefs['theme']),
-                         font_size_icon=get_font_size_icon(prefs['font_size']),
-                         font_size_tooltip=get_font_size_tooltip(prefs['font_size']))
     try:
         session_id = get_session_id()
         
@@ -1247,6 +1206,59 @@ def chat():
         # Log error in production, for now just redirect
         print(f"Error in chat route: {e}")
         return redirect(url_for('index'))
+
+@app.route('/chat_ajax', methods=['POST'])
+def chat_ajax():
+    try:
+        session_id = get_session_id()
+        
+        # Rate limiting check
+        if not check_rate_limit(session_id):
+            return jsonify({'error': 'Rate limit exceeded'}), 429
+        
+        question = request.json.get('question', '').strip()
+        
+        if not question:
+            return jsonify({'error': 'Empty question'}), 400
+        
+        # Basic input validation and sanitization
+        if len(question) > 1000:  # Limit message length
+            question = question[:1000]
+        
+        # Get response from chatbot
+        response = find_answer(question, session_id)
+        
+        # Update chat history in session
+        chat_history = session.get('chat_history', [])
+        chat_history.append({
+            'sender': 'user',
+            'text': question,
+            'timestamp': datetime.now().isoformat()
+        })
+        chat_history.append({
+            'sender': 'bot',
+            'text': response['answer'],
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        # Keep only last 20 messages
+        if len(chat_history) > 20:
+            chat_history = chat_history[-20:]
+        
+        session['chat_history'] = chat_history
+        
+        return jsonify({
+            'success': True,
+            'user_message': question,
+            'bot_response': response['answer'],
+            'in_conversation': response['in_conversation'],
+            'conversation_buttons': response['buttons']
+        })
+    
+    except Exception as e:
+        # Log error in production, for now return error response
+        print(f"Error in AJAX chat route: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/clear_chat', methods=['POST'])
 def clear_chat():

@@ -64,29 +64,27 @@
         <!-- ===== QUICK REPLY BUTTONS ===== -->
         {% if not in_conversation %}
         <div class="quick-replies">
-            <form method="POST" action="{{ url_for('chat') }}" style="display: inline;">
-                <input type="hidden" name="session_id" value="{{ session_id }}">
-                <button type="submit" name="question" value="Horaires d'ouverture" class="quick-reply-btn">⏰ Horaires</button>
-                <button type="submit" name="question" value="Adresse de la mairie" class="quick-reply-btn">📍 Adresse</button>
-                <button type="submit" name="question" value="Certificat de résidence" class="quick-reply-btn">🏠 Certificat résidence</button>
-                <button type="submit" name="question" value="Acte de naissance" class="quick-reply-btn">📋 Acte naissance</button>
-                <button type="submit" name="question" value="Carte d'identité nationale" class="quick-reply-btn">🆔 CNI</button>
-                <button type="submit" name="question" value="Passeport" class="quick-reply-btn">📘 Passeport</button>
+            <form style="display: inline;">
+                <button type="button" data-question="Horaires d'ouverture" class="quick-reply-btn">⏰ Horaires</button>
+                <button type="button" data-question="Adresse de la mairie" class="quick-reply-btn">📍 Adresse</button>
+                <button type="button" data-question="Certificat de résidence" class="quick-reply-btn">🏠 Certificat résidence</button>
+                <button type="button" data-question="Acte de naissance" class="quick-reply-btn">📋 Acte naissance</button>
+                <button type="button" data-question="Carte d'identité nationale" class="quick-reply-btn">🆔 CNI</button>
+                <button type="button" data-question="Passeport" class="quick-reply-btn">📘 Passeport</button>
             </form>
         </div>
         {% else %}
         <div class="conversation-replies">
-            <form method="POST" action="{{ url_for('chat') }}" style="display: inline;">
-                <input type="hidden" name="session_id" value="{{ session_id }}">
+            <form style="display: inline;">
                 {% for button in conversation_buttons %}
-                    <button type="submit" name="question" value="{{ button.value }}" class="quick-reply-btn">{{ button.text }}</button>
+                    <button type="button" data-question="{{ button.value }}" class="quick-reply-btn">{{ button.text }}</button>
                 {% endfor %}
             </form>
         </div>
         {% endif %}
         
         <!-- ===== CHAT INPUT FORM ===== -->
-        <form class="chat-input" method="POST" action="{{ url_for('chat') }}">
+        <form class="chat-input" id="chatForm">
             <input type="hidden" name="session_id" value="{{ session_id }}">
             <div class="input-container">
                 <input type="text" name="question" id="chatInput" placeholder="اكتب سؤالك هنا... Écrivez votre question..." autocomplete="off" required />
@@ -96,7 +94,7 @@
                     </div>
                 </div>
             </div>
-            <button type="submit" class="send-btn">📤 إرسال</button>
+            <button type="submit" class="send-btn" id="sendButton">📤 إرسال</button>
         </form>
     </div>
 
@@ -129,31 +127,6 @@
             { text: "Certificat de célibat", icon: "👤", category: "Documents" }
         ];
 
-        // Apply theme and font size from server-side preferences
-        document.addEventListener('DOMContentLoaded', function() {
-            // Apply theme class if needed
-            const theme = '{{ theme }}' || 'dark';
-            if (theme === 'light') {
-                document.body.classList.add('light-theme');
-            }
-            
-            // Apply font size
-            const fontSize = '{{ font_size }}' || 'normal';
-            if (fontSize !== 'normal') {
-                document.body.setAttribute('data-font-size', fontSize);
-            }
-            
-            // Auto-scroll to bottom of chat messages
-            const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages) {
-                setTimeout(() => {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 100);
-            }
-
-            // Initialize suggestions functionality
-            initializeSuggestions();
-        });
 
         // Suggestions functionality
         function initializeSuggestions() {
@@ -282,6 +255,200 @@
                 chatInput.focus();
             }
         }
+
+        // AJAX Chat functionality
+        function initializeAjaxChat() {
+            const chatForm = document.getElementById('chatForm');
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+            const chatMessages = document.getElementById('chatMessages');
+            const quickReplies = document.querySelector('.quick-replies');
+            const conversationReplies = document.querySelector('.conversation-replies');
+
+            // Handle form submission
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const question = chatInput.value.trim();
+                
+                if (!question) return;
+
+                // Disable form while processing
+                sendButton.disabled = true;
+                sendButton.textContent = '⏳ إرسال...';
+                chatInput.disabled = true;
+
+                // Add user message to chat immediately
+                addMessageToChat('user', question);
+                chatInput.value = '';
+
+                // Hide suggestions
+                const suggestionsDropup = document.getElementById('suggestionsDropup');
+                suggestionsDropup.classList.remove('show');
+
+                // Send AJAX request
+                fetch('/chat_ajax', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        question: question
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Add bot response to chat
+                        addMessageToChat('bot', data.bot_response);
+                        
+                        // Update quick replies based on conversation state
+                        updateQuickReplies(data.in_conversation, data.conversation_buttons);
+                    } else {
+                        // Handle error
+                        addMessageToChat('bot', '<div class="answer-section"><p>عذراً، حدث خطأ في المعالجة. يرجى المحاولة مرة أخرى.</p><p>Désolé, une erreur est survenue. Veuillez réessayer.</p></div>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    addMessageToChat('bot', '<div class="answer-section"><p>عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.</p><p>Désolé, erreur de connexion. Veuillez réessayer.</p></div>');
+                })
+                .finally(() => {
+                    // Re-enable form
+                    sendButton.disabled = false;
+                    sendButton.textContent = '📤 إرسال';
+                    chatInput.disabled = false;
+                    chatInput.focus();
+                });
+            });
+
+            // Handle quick reply button clicks
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('quick-reply-btn')) {
+                    e.preventDefault();
+                    const question = e.target.getAttribute('data-question') || e.target.textContent.trim();
+                    
+                    // Set input value and submit
+                    chatInput.value = question;
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+
+            function addMessageToChat(sender, text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                messageDiv.innerHTML = text;
+                
+                // Add animation
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(20px)';
+                
+                chatMessages.appendChild(messageDiv);
+                
+                // Trigger animation
+                setTimeout(() => {
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                    messageDiv.style.transition = 'all 0.4s ease-out';
+                }, 10);
+                
+                // Scroll to bottom
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 100);
+            }
+
+            function updateQuickReplies(inConversation, conversationButtons) {
+                // Remove existing quick replies
+                const existingQuickReplies = document.querySelector('.quick-replies');
+                const existingConversationReplies = document.querySelector('.conversation-replies');
+                
+                if (existingQuickReplies) {
+                    existingQuickReplies.remove();
+                }
+                if (existingConversationReplies) {
+                    existingConversationReplies.remove();
+                }
+
+                if (inConversation && conversationButtons && conversationButtons.length > 0) {
+                    // Create conversation replies
+                    const conversationRepliesDiv = document.createElement('div');
+                    conversationRepliesDiv.className = 'conversation-replies';
+                    
+                    const form = document.createElement('form');
+                    form.style.display = 'inline';
+                    
+                    conversationButtons.forEach(button => {
+                        const buttonElement = document.createElement('button');
+                        buttonElement.type = 'button';
+                        buttonElement.className = 'quick-reply-btn';
+                        buttonElement.setAttribute('data-question', button.value);
+                        buttonElement.textContent = button.text;
+                        form.appendChild(buttonElement);
+                    });
+                    
+                    conversationRepliesDiv.appendChild(form);
+                    chatForm.parentNode.insertBefore(conversationRepliesDiv, chatForm);
+                } else if (!inConversation) {
+                    // Create default quick replies
+                    const quickRepliesDiv = document.createElement('div');
+                    quickRepliesDiv.className = 'quick-replies';
+                    
+                    const form = document.createElement('form');
+                    form.style.display = 'inline';
+                    
+                    const defaultButtons = [
+                        { text: '⏰ Horaires', value: 'Horaires d\'ouverture' },
+                        { text: '📍 Adresse', value: 'Adresse de la mairie' },
+                        { text: '🏠 Certificat résidence', value: 'Certificat de résidence' },
+                        { text: '📋 Acte naissance', value: 'Acte de naissance' },
+                        { text: '🆔 CNI', value: 'Carte d\'identité nationale' },
+                        { text: '📘 Passeport', value: 'Passeport' }
+                    ];
+                    
+                    defaultButtons.forEach(button => {
+                        const buttonElement = document.createElement('button');
+                        buttonElement.type = 'button';
+                        buttonElement.className = 'quick-reply-btn';
+                        buttonElement.setAttribute('data-question', button.value);
+                        buttonElement.textContent = button.text;
+                        form.appendChild(buttonElement);
+                    });
+                    
+                    quickRepliesDiv.appendChild(form);
+                    chatForm.parentNode.insertBefore(quickRepliesDiv, chatForm);
+                }
+            }
+        }
+
+        // Initialize AJAX chat after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply theme class if needed
+            const theme = '{{ theme }}' || 'dark';
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+            }
+            
+            // Apply font size
+            const fontSize = '{{ font_size }}' || 'normal';
+            if (fontSize !== 'normal') {
+                document.body.setAttribute('data-font-size', fontSize);
+            }
+            
+            // Auto-scroll to bottom of chat messages
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 100);
+            }
+
+            // Initialize suggestions functionality
+            initializeSuggestions();
+            
+            // Initialize AJAX chat functionality
+            initializeAjaxChat();
+        });
     </script>
 </body>
 </html> 
