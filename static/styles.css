@@ -1065,25 +1065,24 @@ body.light-theme .suggestions-dropup::-webkit-scrollbar-thumb:hover {
     html, body {
         overflow-x: hidden;
         width: 100%;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
     }
     
     .chat-container {
         overflow-x: hidden;
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
+        position: relative;
+        width: calc(100% - 20px);
+        height: calc(100vh - 20px);
+        margin: 10px;
     }
     
     .chat-messages {
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
+        flex: 1;
+        min-height: 0;
     }
     
     .message {
