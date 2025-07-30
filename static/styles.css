@@ -138,14 +138,14 @@ body.light-theme .quick-reply-btn {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: var(--off-white);
     border: 1px solid var(--primary-blue);
-    box-shadow: 0 4px 15px rgba(46, 134, 193, 0.25);
+    box-shadow: 0 2px 8px rgba(46, 134, 193, 0.2);
 }
 
 body.light-theme .quick-reply-btn:hover {
     background: linear-gradient(135deg, #1F618D 0%, var(--primary-blue) 100%);
     border-color: #1F618D;
-    box-shadow: 0 6px 20px rgba(46, 134, 193, 0.35);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 134, 193, 0.3);
+    transform: translateY(-1px);
 }
 
 body.light-theme .chat-input input {
@@ -361,8 +361,9 @@ body[data-font-size="large"] .message {
 }
 
 body[data-font-size="large"] .quick-reply-btn {
-    font-size: 16px;
-    padding: 12px 20px;
+    font-size: 13px;
+    padding: 9px 14px;
+    height: 36px;
 }
 
 body[data-font-size="large"] .chat-input input {
@@ -397,8 +398,9 @@ body[data-font-size="xlarge"] .message {
 }
 
 body[data-font-size="xlarge"] .quick-reply-btn {
-    font-size: 20px;
-    padding: 15px 25px;
+    font-size: 14px;
+    padding: 10px 16px;
+    height: 40px;
 }
 
 body[data-font-size="xlarge"] .chat-input input {
@@ -672,14 +674,39 @@ body[data-font-size="xlarge"] .answer-section {
 
 /* ===== QUICK REPLY BUTTONS ===== */
 .quick-replies, .conversation-replies {
-    padding: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px;
     background: rgba(15, 15, 35, 0.4);
     border-top: 1px solid rgba(46, 134, 193, 0.2);
     animation: slideUp 0.4s ease-out;
     backdrop-filter: blur(10px);
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+/* Scrollbar for quick replies */
+.quick-replies::-webkit-scrollbar,
+.conversation-replies::-webkit-scrollbar {
+    width: 6px;
+}
+
+.quick-replies::-webkit-scrollbar-track,
+.conversation-replies::-webkit-scrollbar-track {
+    background: rgba(46, 134, 193, 0.1);
+    border-radius: 3px;
+}
+
+.quick-replies::-webkit-scrollbar-thumb,
+.conversation-replies::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border-radius: 3px;
+}
+
+.quick-replies::-webkit-scrollbar-thumb:hover,
+.conversation-replies::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #1F618D 0%, var(--primary-blue) 100%);
 }
 
 @keyframes slideUp {
@@ -697,33 +724,35 @@ body[data-font-size="xlarge"] .answer-section {
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
     color: var(--off-white);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 14px 22px;
-    border-radius: 28px;
-    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(46, 134, 193, 0.25);
+    box-shadow: 0 2px 8px rgba(46, 134, 193, 0.2);
     white-space: nowrap;
-    min-width: 130px;
     text-align: center;
     backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
+    height: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .quick-reply-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(46, 134, 193, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46, 134, 193, 0.3);
     background: linear-gradient(135deg, #1F618D 0%, var(--primary-blue) 100%);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
 .quick-reply-btn:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(46, 134, 193, 0.3);
+    transform: translateY(0px);
+    box-shadow: 0 2px 6px rgba(46, 134, 193, 0.25);
 }
 
 /* ===== CHAT INPUT ===== */
@@ -986,13 +1015,17 @@ body.light-theme .suggestions-dropup::-webkit-scrollbar-thumb:hover {
     
     /* Ensure quick reply buttons don't cause horizontal scroll */
     .quick-replies, .conversation-replies {
-        flex-wrap: wrap;
-        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 6px;
+        padding: 12px 16px;
+        max-height: 100px;
     }
     
     .quick-reply-btn {
-        flex-shrink: 0;
-        max-width: calc(50% - 4px);
+        padding: 6px 10px;
+        font-size: 11px;
+        height: 28px;
+        border-radius: 10px;
     }
     
     /* Mobile adjustments for suggestions */
@@ -1068,13 +1101,17 @@ body.light-theme .suggestions-dropup::-webkit-scrollbar-thumb:hover {
     }
     
     .quick-replies, .conversation-replies {
-        padding: 15px;
+        padding: 12px 16px;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 6px;
+        max-height: 110px;
     }
     
     .quick-reply-btn {
-        padding: 10px 16px;
-        font-size: 13px;
-        min-width: 100px;
+        padding: 7px 12px;
+        font-size: 12px;
+        height: 30px;
+        border-radius: 11px;
     }
     
     .chat-input {
@@ -1150,9 +1187,10 @@ body.light-theme .suggestions-dropup::-webkit-scrollbar-thumb:hover {
     }
     
     .quick-reply-btn {
-        padding: 8px 12px;
-        font-size: 12px;
-        min-width: 80px;
+        padding: 6px 8px;
+        font-size: 11px;
+        height: 26px;
+        border-radius: 9px;
     }
     
     .chat-input input {
